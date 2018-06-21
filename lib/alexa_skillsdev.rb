@@ -23,6 +23,13 @@ class AlexaSkillsDev
     @accesskey, @url_base = accesskey, url
 
   end
+  
+  def interaction_model(skill_id, stage: 'development', local: 'en-US')
+    
+    get "/v1/skills/{skill_id}/stages/{stage}/interactionModel/" + 
+        "locales/{locale}"
+
+  end      
 
   def vendor()
 
@@ -37,9 +44,32 @@ class AlexaSkillsDev
     get '/v1/vendors'
 
   end
+  
+  def skill(skill_id=nil, name: nil, stage: 'development', locale: nil)
+    
+    if name then
+      
+      r = self.skills()[:skills].select do |x|
+        
+        if locale then
+          x[:nameByLocale][locale] == name
+        else
+          x[:nameByLocale].to_a[0].last == name
+        end
+      end
+      
+      return r.first if r.any?
+      
+    end
+    
+    get "/v1/skills/#{skill_id}/stages/#{stage}/manifest"
+
+  end    
+  
 
   def skills(vendor_id=@vendor_id)
     
+    vendor_id ||= vendor[:id]
     get "/v1/skills?vendorId=#{vendor_id}"
 
   end
