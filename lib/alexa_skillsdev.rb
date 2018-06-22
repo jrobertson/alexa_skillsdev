@@ -5,8 +5,9 @@
 # description: Provides convenient access to the Alexa Skills API methods
 # status: Currently under development.
 
-# see also: [How to get an access token to access the Alexa Skills REST API](http://www.jamesrobertson.eu/snippets/2018/jun/20/how-to-get-an-access-token-to-access-the-alexa-skills-rest-api.html)
-
+# see also: 
+# * [How to get an access token to access the Alexa Skills REST API](http://www.jamesrobertson.eu/snippets/2018/jun/20/how-to-get-an-access-token-to-access-the-alexa-skills-rest-api.html)
+# * [Alexa Skills Kit Command Line Interface and Alexa Skill Management API Overview](https://developer.amazon.com/docs/smapi/ask-cli-intro.html#smapi-intro)
 
 require 'pp'
 require 'json'
@@ -18,9 +19,9 @@ class AlexaSkillsDev
 
   attr_reader :vendor_id
 
-  def initialize(accesskey, url: 'https://api.amazonalexa.com')
-
-    @accesskey, @url_base = accesskey, url
+  def initialize(accesskey, url: 'https://api.amazonalexa.com', debug: false)
+    
+    @accesskey, @url_base, @debug = accesskey, url, debug
 
   end
   
@@ -30,6 +31,31 @@ class AlexaSkillsDev
         "locales/{locale}"
 
   end      
+  
+  # list skills by name
+  #
+  def list()
+    self.skills[:skills].map {|x| x[:nameByLocale].to_a[0].last}
+  end
+  
+  def manifest(name)
+    
+    r = skill(name)
+    get r[:_links][:self][:href]
+    
+  end
+  
+  def model(name=nil, id: nil, stage: 'development', locale: nil)    
+    
+    if name then
+      r = skill(name)      
+      id, stage, locale = r[:skillId], r[:stage], r[:nameByLocale].keys.first
+    end
+    
+    puts  "id: %s stage: %s locale: %s" % [id, stage, locale] if @debug
+    get "/v1/skills/#{id}/stages/#{stage}/interactionModel/locales/#{locale}"
+    
+  end
 
   def vendor()
 
@@ -45,16 +71,16 @@ class AlexaSkillsDev
 
   end
   
-  def skill(skill_id=nil, name: nil, stage: 'development', locale: nil)
+  def skill(name=nil, id: nil, stage: 'development', locale: nil)
     
     if name then
       
       r = self.skills()[:skills].select do |x|
         
         if locale then
-          x[:nameByLocale][locale] == name
+          x[:nameByLocale][locale].downcase == name.downcase
         else
-          x[:nameByLocale].to_a[0].last == name
+          x[:nameByLocale].to_a[0].last.downcase == name.downcase
         end
       end
       
@@ -62,7 +88,7 @@ class AlexaSkillsDev
       
     end
     
-    get "/v1/skills/#{skill_id}/stages/#{stage}/manifest"
+    get "/v1/skills/#{id}/stages/#{stage}/manifest"
 
   end    
   

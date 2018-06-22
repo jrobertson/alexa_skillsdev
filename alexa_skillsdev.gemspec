@@ -1,6 +1,6 @@
 Gem::Specification.new do |s|
   s.name = 'alexa_skillsdev'
-  s.version = '0.1.1'
+  s.version = '0.1.2'
   s.summary = 'Provides convenient access to the Alexa Skills API methods ' + \
       '(currently under development).'
   s.authors = ['James Robertson']
