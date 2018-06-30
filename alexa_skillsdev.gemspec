@@ -1,8 +1,7 @@
 Gem::Specification.new do |s|
   s.name = 'alexa_skillsdev'
-  s.version = '0.1.2'
-  s.summary = 'Provides convenient access to the Alexa Skills API methods ' + \
-      '(currently under development).'
+  s.version = '0.2.0'
+  s.summary = 'Provides convenient access to the Alexa Skills API methods.'
   s.authors = ['James Robertson']
   s.files = Dir['lib/alexa_skillsdev.rb']
   s.signing_key = '../privatekeys/alexa_skillsdev.pem'

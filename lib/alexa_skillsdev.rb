@@ -23,14 +23,26 @@ class AlexaSkillsDev
     
     @accesskey, @url_base, @debug = accesskey, url, debug
 
+  end  
+  
+  def create_skill(obj)
+    
+    if obj['vendorId'].nil? or obj['vendorId'].empty? then
+      vendor()
+      obj['vendorId'] = vendor_id 
+    end
+    
+    post "/v1/skills", obj
+    
   end
   
-  def interaction_model(skill_id, stage: 'development', local: 'en-US')
+  def delete_skill(name=nil, id: nil)
     
-    get "/v1/skills/{skill_id}/stages/{stage}/interactionModel/" + 
-        "locales/{locale}"
-
-  end      
+    skill_id = name ? skill(name)[:skillId] : id
+    
+    delete "/v1/skills/#{skill_id}/"
+    
+  end  
   
   # list skills by name
   #
@@ -56,6 +68,8 @@ class AlexaSkillsDev
     get "/v1/skills/#{id}/stages/#{stage}/interactionModel/locales/#{locale}"
     
   end
+  
+  alias interaction_model model
 
   def vendor()
 
@@ -63,6 +77,11 @@ class AlexaSkillsDev
     @vendor_id = h[:id]
     h
 
+  end
+  
+  def vendor_id()
+    return @vendor_id if @vendor_id
+    vendor()[:id]    
   end
 
   def vendors()
@@ -100,9 +119,49 @@ class AlexaSkillsDev
 
   end
 
+  def status(name)
+    
+    r = skill(name)
+    #get "/v1/skills/#{r[:skillId]}/status?resource=name1&resource=name2"
+    get "/v1/skills/#{r[:skillId]}/status"
+    
+  end
+  
+  def update_model(name=nil, id: nil, stage: 'development', locale: nil, 
+                   model: obj)    
+    
+    if name then
+      r = skill(name)      
+      id, stage, locale = r[:skillId], r[:stage], r[:nameByLocale].keys.first
+    end
+    
+    put "/v1/skills/#{id}/stages/#{stage}/interactionModel/locales/#{locale}", obj
+    
+  end   
+  
+  def update_skill(name=nil, id: nil, stage: 'development', locale: nil, 
+                   manifest: obj)
+    
+    if name then
+      r = skill(name)      
+      id, stage, locale = r[:skillId], r[:stage], r[:nameByLocale].keys.first
+    end
+    
+    put "/v1/skills/#{id}/stages/#{stage}/manifest", obj
+    
+  end  
 
   protected
 
+  def delete(uri)
+
+    r = RestClient.delete(@url_base + uri, 
+                       headers={:Authorization => @accesskey})
+    JSON.parse r.body, symbolize_names: true
+
+  end  
+  
+  
   def get(uri)
 
     r = RestClient.get(@url_base + uri, \
@@ -110,5 +169,23 @@ class AlexaSkillsDev
     JSON.parse r.body, symbolize_names: true
 
   end
+  
+  def post(uri, h)
+
+    r = RestClient.post(@url_base + uri, h.to_json, 
+                       headers={:Authorization => @accesskey, 
+                                content_type: :json, accept: :json})
+    JSON.parse r.body, symbolize_names: true
+
+  end
+
+  def put(uri, h)
+
+    r = RestClient.put(@url_base + uri, h.to_json, 
+                       headers={:Authorization => @accesskey, 
+                                content_type: :json, accept: :json})
+    JSON.parse r.body, symbolize_names: true
+
+  end   
 
 end
