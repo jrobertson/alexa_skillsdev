@@ -28,7 +28,6 @@ class AlexaSkillsDev
   def create_skill(obj)
     
     if obj['vendorId'].nil? or obj['vendorId'].empty? then
-      vendor()
       obj['vendorId'] = vendor_id 
     end
     
@@ -135,7 +134,8 @@ class AlexaSkillsDev
       id, stage, locale = r[:skillId], r[:stage], r[:nameByLocale].keys.first
     end
     
-    put "/v1/skills/#{id}/stages/#{stage}/interactionModel/locales/#{locale}", obj
+    put "/v1/skills/#{id}/stages/#{stage}/interactionModel/locales/#{locale}",
+        model
     
   end   
   
