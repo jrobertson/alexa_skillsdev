@@ -110,6 +110,10 @@ class AlexaSkillsDev
 
   end    
   
+  def skill_id(name)
+    skill(name)[:skillId]
+  end
+  
 
   def skills(vendor_id=@vendor_id)
     
