@@ -151,9 +151,14 @@ class AlexaSkillsDev
       id, stage, locale = r[:skillId], r[:stage], r[:nameByLocale].keys.first
     end
     
-    put "/v1/skills/#{id}/stages/#{stage}/manifest", obj
+    put "/v1/skills/#{id}/stages/#{stage}/manifest", manifest
     
-  end  
+  end
+
+  def update_manifest(skill_name, manifest)
+    update_skill skill_name, manifest: manifest
+  end
+  
 
   protected
 
