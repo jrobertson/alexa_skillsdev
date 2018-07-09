@@ -52,7 +52,7 @@ class AlexaSkillsDev
   def manifest(name)
     
     r = skill(name)
-    get r[:_links][:self][:href]
+    get r[:_links][:self][:href], symbolize: false
     
   end
   
@@ -64,7 +64,8 @@ class AlexaSkillsDev
     end
     
     puts  "id: %s stage: %s locale: %s" % [id, stage, locale] if @debug
-    get "/v1/skills/#{id}/stages/#{stage}/interactionModel/locales/#{locale}"
+    get "/v1/skills/#{id}/stages/#{stage}/interactionModel/locales/#{locale}", 
+        smybolize: false
     
   end
   
@@ -171,11 +172,11 @@ class AlexaSkillsDev
   end  
   
   
-  def get(uri)
+  def get(uri, symbolize: true)
 
     r = RestClient.get(@url_base + uri, \
       headers={'Authorization' => @accesskey})
-    JSON.parse r.body, symbolize_names: true
+    JSON.parse r.body, symbolize_names: symbolize
 
   end
   
