@@ -131,8 +131,8 @@ class AlexaSkillsDev
     
   end
   
-  def update_model(name=nil, id: nil, stage: 'development', locale: nil, 
-                   model: obj)    
+  def update_model(name=nil, model2=nil, id: nil, stage: 'development', locale: nil, 
+                   model: model2)    
     
     if name then
       r = skill(name)      
